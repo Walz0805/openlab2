@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Player</title>
+    <style>
+      body {
+        font-family: "Helvetica Neue", Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+          "sidebar player"
+          "sidebar controls";
+      }
+
+      .sidebar {
+        grid-area: sidebar;
+        background-color: #333;
+        color: #fff;
+        padding: 20px;
+      }
+
+      .video-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .video-list li {
+        cursor: pointer;
+        padding: 10px;
+        border-bottom: 1px solid #444;
+        transition: background-color 0.3s ease;
+        display: flex;
+        align-items: center;
+      }
+
+      .video-list li:hover {
+        background-color: #444;
+      }
+
+      .video-thumbnail {
+        width: 80px;
+        height: 60px;
+        background-size: cover;
+        margin-right: 10px;
+      }
+
+      .video-info {
+        flex-grow: 1;
+      }
+
+      .player-container {
+        grid-area: player;
+        position: relative;
+        width: 100%;
+        height: 700px;
+      }
+
+      video {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .controls {
+        grid-area: controls;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .controls button {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        transition: color 0.3s ease;
+      }
+
+      .controls button:hover {
+        color: #ffd700;
+      }
+
+      .speed-select {
+        display: flex;
+        align-items: center;
+      }
+
+      .speed-select label {
+        margin-right: 5px;
+        font-size: 14px;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 5px;
+        background-color: #444;
+        margin-top: 10px;
+        position: relative;
+      }
+
+      .progress {
+        height: 100%;
+        background-color: #ffd700;
+        width: 0%;
+        transition: width 0.1s ease; /* 减少进度条过渡时间以更快重置 */
+      }
+
+      .danmaku-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      .danmu {
+        color: rgb(149, 31, 156);
+        font-size: 20px;
+        position: absolute;
+        left: 800px;
+        top: 0;
+        white-space: nowrap;
+      }
+
+      input[type="text"],
+      input[type="color"],
+      input[type="number"] {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+
+      button {
+        padding: 8px 15px;
+        background-color: #4caf50;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #3e8e41;
+      }
+
+      @media only screen and (max-width: 768px) {
+        .sidebar {
+          display: none;
+        }
+      }
+    </style>
+    <link rel="stylesheet" href="./font/iconfont.css" />
+  </head>
+
+  <body>
+    <div style="position: absolute; bottom: 0; left: 0">
+      <button onclick="goBack()">返回上一页</button>
+    </div>
+    <div class="sidebar">
+      <div style="display: flex; align-items: center">
+        <input type="text" id="search-input" placeholder="搜索视频" />
+        <button id="search-button" onclick="performSearch()">搜索</button>
+      </div>
+      <ul class="video-list">
+        <li
+          data-src="黑鱼捕食.mp4"
+          data-thumbnail="thumbnail1.jpg"
+          data-description="Video 1 Description"
+          data-title="黑鱼捕食"
+          onclick="playVideo('黑鱼捕食.mp4', '黑鱼捕食', 'Video 1 Description', 120)"
+        >
+          <div
+            class="video-thumbnail"
+            style="background-image: url(thumbnail1.jpg)"
+          ></div>
+          <div class="video-info">
+            <h3>黑鱼捕食</h3>
+            <p>时长：00:03</p>
+            <p>简介：捕食</p>
+          </div>
+        </li>
+        <li
+          data-src="乌龟捕食.mp4"
+          data-thumbnail="thumbnail2.jpg"
+          data-description="Video 2 Description"
+          data-title="乌龟捕食"
+          onclick="playVideo('乌龟捕食.mp4', '乌龟捕食', 'Video 2 Description', 150)"
+        >
+          <div
+            class="video-thumbnail"
+            style="background-image: url(thumbnail2.jpg)"
+          ></div>
+          <div class="video-info">
+            <h3>乌龟捕食</h3>
+            <p>时长：00:41</p>
+            <p>简介：捕食</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="player-container">
+      <video id="player"></video>
+    </div>
+    <div class="controls">
+      <button onclick="togglePlay()">播放/暂停</button>
+      <div class="speed-select">
+        <label>Speed:</label>
+        <select onchange="changeSpeed(this.value)">
+          <option value="0.5">0.5x</option>
+          <option value="1" selected>1x</option>
+          <option value="1.5">1.5x</option>
+          <option value="2">2x</option>
+          <option value="3">3x</option>
+        </select>
+      </div>
+      <div class="progress-bar">
+        <div class="progress"></div>
+      </div>
+      <button onclick="likeVideo()">👍 点赞</button>
+      <span id="likes-count">0</span> 个赞
+      <button onclick="toggleFullScreen()">全屏</button>
+      <button onclick="shareVideo()">
+        <span class="iconfont icon-zhuanfa"></span>分享
+      </button>
+      <button onclick="increaseVolume()">+ 音量</button>
+      <button onclick="decreaseVolume()">-音量</button>
+      <button onclick="fastForward()">快进10秒</button>
+      <button onclick="rewind()">快退10秒</button>
+      <button id="loopButton" onclick="toggleLoop()">循环播放</button>
+      <button onclick="downloadVideo()">下载视频</button>
+    </div>
+    <div class="danmaku-container"></div>
+    <div
+      style="
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+      "
+    >
+      <input type="text" id="content" placeholder="输入弹幕内容" />
+      <button id="send">发送弹幕</button>
+    </div>
+
+    <script>
+      function goBack() {
+        window.history.back();
+      }
+
+      let player;
+      let currentTime = 0;
+      let duration = 0;
+      let intervalId;
+      let likesCount = 0;
+
+      let isLooping = false;
+
+      // 页面加载时不自动播放视频
+      window.onload = function () {
+        const video2Item = document.querySelectorAll(".video-list li")[1];
+        const src = video2Item.getAttribute("data-src");
+        const title = video2Item.getAttribute("data-title");
+        const description = video2Item.getAttribute("data-description");
+        const durationStr = video2Item.getAttribute("data-duration");
+        const durationInSeconds = durationStr
+          ? convertDurationToSeconds(durationStr)
+          : 0;
+        // 不要在这里自动播放视频
+        // playVideo(src, title, description, durationInSeconds);
+      };
+
+      function playVideo(src, title, description, durationInSeconds) {
+        player = document.getElementById("player");
+        player.src = src;
+        duration = durationInSeconds;
+        // 播放视频时重置进度条
+        resetProgress();
+        // 这里也不要自动播放视频，等待用户交互后再播放
+        // player.play();
+        startProgressUpdate();
+
+        // 确保在视频加载完成后再添加事件监听器
+        player.onloadedmetadata = function () {
+          player.addEventListener("timeupdate", function () {
+            updateProgress();
+          });
+          if (isLooping) {
+            player.addEventListener("ended", handleEnded);
+          }
+        };
+      }
+
+      function togglePlay() {
+        if (player.paused) {
+          // 播放视频时重置进度条
+          resetProgress();
+          // 如果用户点击播放按钮，触发播放操作
+          player.play().catch((error) => {
+            if (error.name === "NotAllowedError") {
+              // 用户没有交互时，提示用户进行交互
+              alert("请先点击页面进行交互后再播放视频。");
+            } else {
+              console.error(error);
+            }
+          });
+        } else {
+          player.pause();
+        }
+      }
+
+      function changeSpeed(speed) {
+        player.playbackRate = speed;
+      }
+
+      function startProgressUpdate() {
+        intervalId = setInterval(updateProgress, 100);
+      }
+
+      function updateProgress() {
+        if (player && player.duration) {
+          currentTime = player.currentTime;
+          const progress = (currentTime / player.duration) * 100;
+          document.querySelector(".progress").style.width = progress + "%";
+          if (currentTime >= player.duration) {
+            if (isLooping) {
+              player.currentTime = 0;
+              player.play();
+              startProgressUpdate();
+            } else {
+              clearInterval(intervalId);
+            }
+          }
+        }
+      }
+
+      function likeVideo() {
+        likesCount++;
+        document.getElementById("likes-count").textContent = likesCount;
+      }
+
+      function toggleFullScreen() {
+        const videoPlayer = document.getElementById("player");
+        if (!document.fullscreenElement) {
+          if (videoPlayer.requestFullscreen) {
+            videoPlayer.requestFullscreen();
+          } else if (videoPlayer.mozRequestFullScreen) {
+            videoPlayer.mozRequestFullScreen();
+          } else if (videoPlayer.webkitRequestFullscreen) {
+            videoPlayer.webkitRequestFullscreen();
+          }
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          }
+        }
+      }
+
+      function shareVideo() {
+        if (navigator.share) {
+          navigator
+            .share({
+              title: "精彩视频",
+              url: window.location.href,
+            })
+            .then(() => {
+              console.log("分享成功");
+            })
+            .catch((error) => {
+              console.log("分享失败", error);
+            });
+        } else {
+          alert("请手动复制链接进行分享。");
+        }
+      }
+
+      function resetProgress() {
+        currentTime = 0;
+        // 立即设置过渡时间为 0，然后再设置回原来的值以加快重置
+        const progressBar = document.querySelector(".progress");
+        const originalTransition = progressBar.style.transition;
+        progressBar.style.transition = "width 0s";
+        progressBar.style.width = "0%";
+        setTimeout(() => {
+          progressBar.style.transition = originalTransition;
+        }, 0);
+      }
+
+      function increaseVolume() {
+        if (player.volume < 1) {
+          player.volume += 0.1;
+        }
+      }
+
+      function decreaseVolume() {
+        if (player.volume > 0) {
+          player.volume -= 0.1;
+        }
+      }
+
+      function fastForward() {
+        if (player.currentTime + 10 < player.duration) {
+          player.currentTime += 10;
+        } else {
+          player.currentTime = player.duration;
+        }
+      }
+
+      function rewind() {
+        if (player.currentTime - 10 >= 0) {
+          player.currentTime -= 10;
+        } else {
+          player.currentTime = 0;
+        }
+      }
+
+      function toggleLoop() {
+        isLooping = !isLooping;
+        const loopButton = document.getElementById("loopButton");
+        if (isLooping) {
+          loopButton.style.backgroundColor = "#ffd700";
+          if (player) {
+            player.addEventListener("ended", handleEnded);
+          }
+        } else {
+          loopButton.style.backgroundColor = "rgba(0, 0, 0, 0)";
+          if (player) {
+            player.removeEventListener("ended", handleEnded);
+          }
+        }
+
+        function handleEnded() {
+          if (isLooping) {
+            player.currentTime = 0;
+            player.play();
+          }
+        }
+      }
+
+      function performSearch() {
+        const searchValue = document
+          .getElementById("search-input")
+          .value.toLowerCase();
+        const videoList = document.querySelectorAll(".video-list li");
+        videoList.forEach((item) => {
+          const title = item.getAttribute("data-title").toLowerCase();
+          const description = item
+            .getAttribute("data-description")
+            .toLowerCase();
+          if (
+            title.includes(searchValue) ||
+            description.includes(searchValue)
+          ) {
+            item.style.display = "flex";
+          } else {
+            item.style.display = "none";
+          }
+        });
+      }
+
+      // 视频列表点击播放功能
+      const videoItems = document.querySelectorAll(".video-list li");
+      videoItems.forEach((item) => {
+        item.addEventListener("click", function () {
+          const src = this.getAttribute("data-src");
+          const title = this.getAttribute("data-title");
+          const description = this.getAttribute("data-description");
+          const durationStr = this.getAttribute("data-duration");
+          const durationInSeconds = durationStr
+            ? convertDurationToSeconds(durationStr)
+            : 0;
+          playVideo(src, title, description, durationInSeconds);
+        });
+      });
+
+      function convertDurationToSeconds(durationStr) {
+        if (!durationStr) {
+          return 0;
+        }
+        const parts = durationStr.split(":");
+        const minutes = parseInt(parts[0]);
+        const seconds = parseInt(parts[1]);
+        return minutes * 60 + seconds;
+      }
+
+      // 弹幕
+      var oVideoBox = document.querySelector(".player-container");
+      var oContent = document.querySelector("#content");
+      var oSend = document.querySelector("#send");
+
+      oSend.onclick = function () {
+        var content = oContent.value;
+        add(content);
+      };
+
+      function add(content) {
+        if (!content) {
+          alert("您未输入弹幕内容");
+          return;
+        }
+        var oSpan = document.createElement("span");
+        oSpan.className = "danmu";
+        oSpan.innerHTML = content;
+        oVideoBox.appendChild(oSpan);
+        var maxTop = oVideoBox.clientHeight - oSpan.offsetHeight;
+        oSpan.style.top = Math.round(Math.random() * maxTop) + "px";
+        oSpan.style.left = "1160px";
+
+        var timer = setInterval(() => {
+          var start = oSpan.offsetLeft;
+          start -= 3;
+
+          oSpan.style.left = start + "px";
+
+          if (start < -oSpan.offsetWidth) {
+            clearInterval(timer);
+            oSpan.remove();
+          }
+        }, 10);
+        oContent.value = "";
+      }
+
+      function downloadVideo() {
+        if (player) {
+          const info = {
+            url: player.src,
+            name: "video",
+            type: ".mp4",
+          };
+          if (confirm("确定要下载视频吗？")) {
+            download(info);
+          }
+        }
+      }
+
+      async function download(info) {
+        let link = document.createElement("a");
+        let url = info.url;
+        await fetch(url)
+          .then((res) => res.blob())
+          .then((blob) => {
+            link.href = URL.createObjectURL(blob);
+            link.download = info.name + info.type;
+            document.body.appendChild(link);
+            link.click();
+          });
+      }
+
+      // function downloadVideo() {
+      //   if (player && player.src) {
+      //     if (confirm("确定要下载视频吗？")) {
+      //       const a = document.createElement("a");
+      //       a.href = player.src;
+      //       a.download = "video.mp4";
+      //       document.body.appendChild(a);
+      //       a.click();
+      //       document.body.removeChild(a);
+      //     }
+      //   }
+      // }
+    </script>
+  </body>
+</html>
