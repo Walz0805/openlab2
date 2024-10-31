@@ -7,13 +7,9 @@
   </head>
   <body>
     <h1>播放器设置</h1>
-    <label for="speedSelect">选择倍速:</label>
-    <select id="speedSelect">
-      <option value="1" selected>1x</option>
-      <option value="1.5">1.5x</option>
-      <option value="2">2x</option>
-    </select>
-    <button id="setSpeed">设置倍速</button>
+    <label for="speed-input">播放倍速:</label>
+    <input type="text" id="speed-input" placeholder="请输入播放倍速" />
+    <button id="speed-button">确认改变</button>
     <button id="toggleNightMode">夜间模式</button>
     <script src="popup.js"></script>
   </body>

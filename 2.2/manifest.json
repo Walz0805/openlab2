@@ -2,6 +2,7 @@
   "manifest_version": 3,
   "name": "B站播放器增强",
   "version": "1.0",
+  "description": "增强 B 站播放器的功能，包括倍速控制和夜间模式切换。",
   "permissions": ["activeTab"],
   "action": {
     "default_popup": "popup.html",
@@ -17,5 +18,10 @@
       "js": ["content.js"],
       "css": ["styles.css"]
     }
-  ]
+  ],
+  "icons": {
+    "16": "下载1.png",
+    "48": "下载2.png",
+    "128": "下载3.png"
+  }
 }

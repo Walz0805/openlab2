@@ -5,10 +5,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const video = document.querySelector("video");
     if (video) {
       video.playbackRate = request.value;
+      sendResponse({ success: true });
+    } else {
+      sendResponse({ success: false });
     }
   } else if (request.action === "toggleNightMode") {
     nightMode = !nightMode;
-    document.body.style.backgroundColor = nightMode ? "black" : "white";
-    document.body.style.color = nightMode ? "white" : "black";
+    if (nightMode) {
+      document.body.classList.add("night-mode");
+    } else {
+      document.body.classList.remove("night-mode");
+    }
+    sendResponse({ success: true });
   }
 });

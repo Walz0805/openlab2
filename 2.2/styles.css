@@ -1,6 +1,7 @@
 body {
   font-family: Arial, sans-serif;
   padding: 10px;
+  transition: background-color 0.3s, color 0.3s; /* 平滑过渡效果 */
 }
 
 h1 {
@@ -10,4 +11,9 @@ h1 {
 
 button {
   margin-top: 10px;
+}
+
+.night-mode {
+  background-color: black;
+  color: white;
 }
