@@ -1,21 +1,39 @@
 let nightMode = false;
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "setSpeed") {
-    const video = document.querySelector("video");
-    if (video) {
-      video.playbackRate = request.value;
-      sendResponse({ success: true });
-    } else {
-      sendResponse({ success: false });
-    }
-  } else if (request.action === "toggleNightMode") {
+  if (request.action === "toggleNightMode") {
     nightMode = !nightMode;
-    if (nightMode) {
-      document.body.classList.add("night-mode");
-    } else {
-      document.body.classList.remove("night-mode");
-    }
+    toggleNightMode(nightMode);
     sendResponse({ success: true });
   }
 });
+
+function toggleNightMode(enabled) {
+  if (enabled) {
+    document.body.style.backgroundColor = "#000";
+    document.body.style.color = "#FFF";
+    const elements = document.querySelectorAll("a, h1, h2, h3, p");
+    elements.forEach((element) => {
+      element.style.color = "#FFF";
+    });
+  } else {
+    document.body.style.backgroundColor = "#FFF";
+    document.body.style.color = "#000";
+    const elements = document.querySelectorAll("a, h1, h2, h3, p");
+    elements.forEach((element) => {
+      element.style.color = "#000";
+    });
+  }
+}
+
+// 可选：根据系统时间自动切换模式
+// function checkTimeForAutoToggle() {
+//   const hour = new Date().getHours();
+//   if (hour >= 18 || hour < 6) {
+//     nightMode = true;
+//     toggleNightMode(nightMode);
+//   }
+// }
+
+// 初始化检查
+checkTimeForAutoToggle();

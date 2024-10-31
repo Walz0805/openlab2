@@ -1,19 +1,17 @@
 body {
   font-family: Arial, sans-serif;
   padding: 10px;
-  transition: background-color 0.3s, color 0.3s; /* 平滑过渡效果 */
-}
-
-h1 {
-  font-size: 18px;
-  margin-bottom: 10px;
 }
 
 button {
-  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-.night-mode {
-  background-color: black;
-  color: white;
+button:hover {
+  background-color: #0056b3;
 }

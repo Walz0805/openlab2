@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "B站播放器增强",
+  "name": "B站夜间模式",
   "version": "1.0",
-  "description": "增强 B 站播放器的功能，包括倍速控制和夜间模式切换。",
+  "description": "将 B 站页面切换到夜间模式。",
   "permissions": ["activeTab"],
   "action": {
     "default_popup": "popup.html",
@@ -15,8 +15,7 @@
   "content_scripts": [
     {
       "matches": ["*://www.bilibili.com/*"],
-      "js": ["content.js"],
-      "css": ["styles.css"]
+      "js": ["content.js"]
     }
   ],
   "icons": {
