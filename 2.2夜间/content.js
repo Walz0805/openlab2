@@ -26,14 +26,13 @@ function toggleNightMode(enabled) {
   }
 }
 
-// 可选：根据系统时间自动切换模式
-// function checkTimeForAutoToggle() {
-//   const hour = new Date().getHours();
-//   if (hour >= 18 || hour < 6) {
-//     nightMode = true;
-//     toggleNightMode(nightMode);
-//   }
-// }
+// 根据系统时间自动切换模式
+function checkTimeForAutoToggle() {
+  const hour = new Date().getHours();
+  if (hour >= 18 || hour < 6) {
+    nightMode = true;
+    toggleNightMode(nightMode);
+  }
+}
 
-// 初始化检查
 checkTimeForAutoToggle();

@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "B站倍速控制",
+  "version": "1.0",
+  "permissions": ["activeTab"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "下载2.png",
+      "48": "下载1.png",
+      "128": "下载3.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.bilibili.com/video/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
