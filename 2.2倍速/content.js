@@ -21,6 +21,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
           const listItem = document.createElement("li");
           listItem.textContent = `${request.playbackRate}x`;
           listItem.setAttribute("data-value", request.playbackRate);
+          listItem.style.cursor = "pointer";
           speedList.appendChild(listItem); // 添加倍速选项
         }
       }
